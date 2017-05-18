@@ -47,13 +47,18 @@ start_link(Host, Port, Database, Password, ReconnectSleep) ->
     start_link(Host, Port, Database, Password, ReconnectSleep, ?TIMEOUT).
 
 start_link(Host, Port, Database, Password, ReconnectSleep, ConnectTimeout)
+  when is_function(Host),
+       is_function(Port) ->
+    start_link(Host(), Port(), Database, Password,ReconnectSleep, ConnectTimeout);
+
+start_link(Host, Port, Database, Password, ReconnectSleep, ConnectTimeout)
   when is_list(Host),
        is_integer(Port),
        is_integer(Database) orelse Database == undefined,
        is_list(Password),
        is_integer(ReconnectSleep) orelse ReconnectSleep =:= no_reconnect,
        is_integer(ConnectTimeout) ->
-
+    io:format("will connect redis:~p ~p~n",[Host,Port]),
     eredis_client:start_link(Host, Port, Database, Password,
                              ReconnectSleep, ConnectTimeout).
 
